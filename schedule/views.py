@@ -8,6 +8,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils import timezone
 from django.core.exceptions import PermissionDenied
+from django.shortcuts import get_object_or_404
 
 from .models import Day, Period, Schedule, Course, Task, Timetable
 from .forms import (
@@ -288,6 +289,14 @@ class DayCreateView(LoginRequiredMixin, CreateView):
     form_class = DayForm
     template_name = 'schedule/day_form.html'
     success_url = reverse_lazy('schedule:timetable_list')
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        # フォームを作る前に、URLに含まれる timetable_pk から時間割を取得してセットしておく
+        timetable = get_object_or_404(Timetable, pk=self.kwargs['timetable_pk'])
+        kwargs['instance'] = Day(timetable=timetable)
+        return kwargs
+
     def form_valid(self, form):
         form.instance.timetable = get_object_or_404(Timetable, pk=self.kwargs.get('timetable_pk'), user=self.request.user)
         return super().form_valid(form)
@@ -308,6 +317,14 @@ class PeriodCreateView(LoginRequiredMixin, CreateView):
     form_class = PeriodForm
     template_name = 'schedule/period_form.html'
     success_url = reverse_lazy('schedule:timetable_list')
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        # フォームを作る前に、URLに含まれる timetable_pk から時間割を取得してセットしておく
+        timetable = get_object_or_404(Timetable, pk=self.kwargs['timetable_pk'])
+        kwargs['instance'] = Period(timetable=timetable)
+        return kwargs
+
     def form_valid(self, form):
         form.instance.timetable = get_object_or_404(Timetable, pk=self.kwargs.get('timetable_pk'), user=self.request.user)
         return super().form_valid(form)

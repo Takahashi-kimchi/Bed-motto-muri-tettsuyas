@@ -22,7 +22,13 @@
                 </div>
                 <div>
                     <label style="display: block; font-weight: bold; margin-bottom: 8px;">表示順</label>
-                    {{ form.order }}
+                    {{ form.order }} {% if form.order.errors %}
+                        <div style="color: red; font-weight: bold;">
+                            {% for error in form.order.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+    {% endif %}
                 </div>
             </div>
 
