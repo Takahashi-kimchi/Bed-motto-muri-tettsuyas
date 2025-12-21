@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ course.name }} の詳細{% endblock %}
+
+{% block content %}
+<style>
+    /* 詳細画面専用のスタイル */
+    .detail-card { border-top: 5px solid {{ course.color|default:'#007bff' }}; }
+    .task-item { border-bottom: 1px solid var(--border-color); padding: 10px 0; }
+    .task-item:last-child { border-bottom: none; }
+    .meta-label { font-size: 0.85em; color: var(--text-sub); margin-bottom: 4px; }
+    .meta-value { font-weight: bold; margin-bottom: 15px; }
+</style>
+
+<div style="margin-bottom: 20px;">
+    <a href="{{ back_url }}" style="text-decoration: none; color: var(--accent-color); font-weight: bold;">← 時間割に戻る</a>
+</div>
+
+<div class="card detail-card">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
+        <h1 style="margin: 0; font-size: 1.8em;">{{ course.name }}</h1>
+        <a href="{% url 'schedule:update' pk=schedule.pk %}" class="card" style="padding: 8px 15px; text-decoration: none; font-size: 0.9em; background: var(--bg-color); border: 1px solid var(--border-color);">✏️ 編集</a>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <div>
+            <div class="meta-label">📍 教室</div>
+            <div class="meta-value">{{ course.room|default:"未設定" }}</div>
+        </div>
+        <div>
+            <div class="meta-label">👨‍🏫 担当教員</div>
+            <div class="meta-value">{{ course.instructor|default:"未設定" }}</div>
+        </div>
+    </div>
+
+    <div class="meta-label">📝 概要・メモ</div>
+    <div style="background: var(--bg-color); padding: 15px; border-radius: 8px; margin-bottom: 25px; white-space: pre-wrap;">{{ course.description|default:"メモはありません。" }}</div>
+
+    <h2 style="font-size: 1.2em; border-bottom: 2px solid var(--border-color); padding-bottom: 10px;">✍️ ToDoリスト</h2>
+    <div style="margin-top: 15px;">
+        {% for task in tasks %}
+            <div class="task-item" style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <span style="{% if task.is_completed %}text-decoration: line-through; color: var(--text-sub);{% endif %} font-weight: bold;">
+                        {{ task.title }}
+                    </span>
+                    <div style="font-size: 0.8em; color: var(--text-sub);">📅 期限: {{ task.due_date|default:"未設定" }}</div>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <a href="{% url 'schedule:task_toggle' pk=task.pk %}" style="text-decoration: none; font-size: 0.8em; padding: 5px 10px; border-radius: 5px; background: {% if task.is_completed %}#666{% else %}#28a745{% endif %}; color: white;">
+                        {% if task.is_completed %}未完了に戻す{% else %}完了{% endif %}
+                    </a>
+                    <a href="{% url 'schedule:task_delete' pk=task.pk %}" style="text-decoration: none; font-size: 0.8em; padding: 5px 10px; border-radius: 5px; background: #ff4d4f; color: white;" onclick="return confirm('本当に削除しますか？')">削除</a>
+                </div>
+            </div>
+        {% empty %}
+            <p style="color: var(--text-sub); text-align: center;">登録されたToDoはありません。</p>
+        {% endfor %}
+    </div>
+
+    <div style="margin-top: 30px; padding: 20px; background: var(--bg-color); border-radius: 10px;">
+        <h3 style="margin-top: 0; font-size: 1em;">＋ 新しいToDoを追加</h3>
+        <form method="post" style="display: grid; gap: 10px;">
+            {% csrf_token %}
+            {{ task_form.title }}
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <span style="font-size: 0.9em;">期限:</span>{{ task_form.due_date }}
+                <button type="submit" style="background: var(--accent-color); color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold;">追加</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    input[type="text"], input[type="date"] {
+        width: 100%; padding: 10px; border-radius: 5px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main);
+    }
+</style>
+{% endblock %}

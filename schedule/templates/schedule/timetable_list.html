@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block title %}時間割設定センター{% endblock %}
+
+{% block content %}
+<style>
+    .timetable-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--border-color); padding-bottom: 10px; margin-bottom: 15px; }
+    .badge { background: var(--text-sub); color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px; }
+    .default-badge { background: #28a745; }
+    .grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .setting-section { background: var(--bg-color); padding: 15px; border-radius: 8px; border: 1px solid var(--border-color); }
+    .setting-section h3 { margin-top: 0; font-size: 16px; display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; }
+    ul { list-style: none; padding: 0; font-size: 14px; margin: 0; }
+    li { padding: 10px 0; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+    li:last-child { border-bottom: none; }
+    .btn { text-decoration: none; font-size: 13px; color: var(--accent-color); font-weight: bold; }
+    .btn-add { font-weight: bold; color: #28a745; text-decoration: none; }
+</style>
+
+<div style="margin-bottom: 20px;">
+    <a href="{{ back_url }}" style="text-decoration: none; color: var(--accent-color); font-weight: bold;">← 時間割に戻る</a>
+</div>
+
+<h1 style="color: var(--text-main); margin-bottom: 5px;">⚙️ 時間割設定センター</h1>
+<p style="margin-bottom: 30px;"><a href="{% url 'schedule:timetable_create' %}" class="btn-add">＋ 新しい時間割セットを作成</a></p>
+
+{% for tt in timetables %}
+<div class="card" style="margin-bottom: 30px;">
+    <div class="timetable-header">
+        <h2 style="margin: 0; font-size: 1.4em;">
+            {{ tt.name }} 
+            {% if tt.is_default %}<span class="badge default-badge">デフォルト</span>{% endif %}
+        </h2>
+        <div>
+            <a href="{% url 'schedule:timetable_update' tt.pk %}" class="btn">編集</a>
+            <a href="{% url 'schedule:timetable_delete' tt.pk %}" class="btn" style="color:#ff4d4f; margin-left:15px;">削除</a>
+        </div>
+    </div>
+
+    <div class="grid-container">
+        <div class="setting-section">
+            <h3>曜日 <a href="{% url 'schedule:day_create' timetable_pk=tt.pk %}" class="btn-add" style="font-size: 0.8em;">+追加</a></h3>
+            <ul>
+                {% for day in tt.day_list %}
+                <li>
+                    <span>{{ day.name }} <small style="color: var(--text-sub);">(順序: {{ day.order }})</small></span>
+                    <div>
+                        <a href="{% url 'schedule:day_update' day.pk %}" class="btn" style="margin-right: 10px;">編集</a>
+                        <a href="{% url 'schedule:day_delete' day.pk %}" class="btn" style="color: #ff4d4f;">削除</a>
+                    </div>
+                </li>
+                {% empty %}
+                <li style="color: var(--text-sub);">曜日が未登録です</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="setting-section">
+            <h3>時限 <a href="{% url 'schedule:period_create' timetable_pk=tt.pk %}" class="btn-add" style="font-size: 0.8em;">+追加</a></h3>
+            <ul>
+                {% for period in tt.period_list %}
+                <li>
+                    <span>{{ period.name }} <small style="color: var(--text-sub);">({{ period.start_time|date:"H:i" }}〜)</small></span>
+                    <div>
+                        <a href="{% url 'schedule:period_update' period.pk %}" class="btn" style="margin-right: 10px;">編集</a>
+                        <a href="{% url 'schedule:period_delete' period.pk %}" class="btn" style="color: #ff4d4f;">削除</a>
+                    </div>
+                </li>
+                {% empty %}
+                <li style="color: var(--text-sub);">時限が未登録です</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+
+{% endfor %}
+
+<div style="margin-top: 50px; text-align: center; border-top: 1px solid var(--border-color); padding-top: 20px;">
+    <p style="color: var(--text-sub); font-size: 0.85em;">アカウントの利用を停止しますか？</p>
+    <a href="{% url 'schedule:account_delete' %}" style="color: var(--color-overdue); font-size: 0.85em; text-decoration: none; font-weight: bold;">
+        退会手続き（アカウント削除）
+    </a>
+</div>
+
+{% endblock %}

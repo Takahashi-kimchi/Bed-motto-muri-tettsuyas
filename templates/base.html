@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}時間割アプリ{% endblock %}</title>
+    <style>
+        /* --- より鮮やかで視認性の高いカラー定義 --- */
+        :root {
+            --bg-color: #f0f4f8;
+            --card-bg: #ffffff;
+            --text-main: #1a202c;
+            --text-sub: #4a5568;
+            --border-color: #cbd5e0;
+            --header-bg: #ffffff;
+            --shadow: rgba(0, 0, 0, 0.1);
+            --accent-color: #3182ce;
+            --color-overdue: #e53e3e;
+            --color-today: #dd6b20;
+            --color-weekly: #3182ce;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #0d1117;
+            --card-bg: #161b22;
+            --text-main: #f0f6fc;
+            --text-sub: #8b949e;
+            --border-color: #30363d;
+            --header-bg: #161b22;
+            --shadow: rgba(0, 0, 0, 0.6);
+            --accent-color: #58a6ff;
+            --color-overdue: #ff7b72;
+            --color-today: #ffa657;
+            --color-weekly: #58a6ff;
+        }
+
+        body { 
+            background-color: var(--bg-color); 
+            color: var(--text-main); 
+            margin: 0; 
+            transition: 0.3s; 
+            font-family: 'Segoe UI', 'Hiragino Kaku Gothic ProN', sans-serif; 
+        }
+
+        header { 
+            background: var(--header-bg); 
+            padding: 12px 20px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            box-shadow: 0 2px 8px var(--shadow);
+            border-bottom: 1px solid var(--border-color);
+            transition: 0.3s;
+        }
+
+        #theme-toggle { 
+            background-color: var(--accent-color); 
+            color: #ffffff; 
+            border: none;
+            padding: 8px 18px;
+            border-radius: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 0.85em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 6px var(--shadow);
+        }
+
+        .logout-btn {
+            background: none;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-sub);
+            cursor: pointer;
+            padding: 4px 12px;
+            font-size: 0.8em;
+        }
+
+        .container { padding: 20px; max-width: 1200px; margin: 0 auto; }
+        .card { background: var(--card-bg); border-radius: 12px; box-shadow: 0 4px 6px var(--shadow); padding: 20px; color: var(--text-main); transition: 0.3s; }
+    </style>
+</head>
+<body>
+    <header>
+        <div style="font-weight: bold; color: var(--accent-color); font-size: 1.2em;">📘 時間割</div>
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <button id="theme-toggle"><span id="theme-text">ダークモードに変更</span></button>
+            {% if user.is_authenticated %}
+                <div style="display: flex; align-items: center; gap: 12px; border-left: 2px solid var(--border-color); padding-left: 15px;">
+                    <span style="font-size: 0.9em; font-weight: bold;">{{ user.username }}さん</span>
+                    <form method="post" action="{% url 'logout' %}" style="display: inline;">
+                        {% csrf_token %}<button type="submit" class="logout-btn">ログアウト</button>
+                    </form>
+                </div>
+            {% endif %}
+        </div>
+    </header>
+
+    <div class="container">
+        {% block content %}{% endblock %}
+    </div>
+
+    <script>
+        const btn = document.getElementById("theme-toggle");
+        const themeText = document.getElementById("theme-text");
+        const html = document.documentElement;
+        const applyTheme = (theme) => {
+            if (theme === "dark") {
+                html.setAttribute("data-theme", "dark");
+                if(themeText) themeText.innerText = "☀️ライトモードに変更";
+            } else {
+                html.removeAttribute("data-theme");
+                if(themeText) themeText.innerText = "🌙ダークモードに変更";
+            }
+        };
+        const savedTheme = localStorage.getItem("theme");
+        const systemDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+        applyTheme(savedTheme || (systemDark ? "dark" : "light"));
+        if(btn) {
+            btn.addEventListener("click", () => {
+                const isDark = html.getAttribute("data-theme") === "dark";
+                const newTheme = isDark ? "light" : "dark";
+                applyTheme(newTheme);
+                localStorage.setItem("theme", newTheme);
+            });
+        }
+    </script>
+</body>
+</html>

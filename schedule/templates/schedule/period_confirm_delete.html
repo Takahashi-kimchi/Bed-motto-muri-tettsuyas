@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}時限の削除確認{% endblock %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 0 auto;">
+    <div class="card" style="border: 1px solid #dc3545;">
+        <h1 style="color: #dc3545; font-size: 1.5em; border-bottom: 2px solid rgba(220, 53, 69, 0.2); padding-bottom: 10px; margin-top: 0;">
+            ⚠️ 時限の削除確認
+        </h1>
+
+        <p style="font-size: 1.1em; margin: 20px 0; color: var(--text-main);">
+            本当に時限「<strong>{{ period.name }} ({{ period.start_time|date:"H:i" }} - {{ period.end_time|date:"H:i" }})</strong>」を削除してもよろしいですか？
+        </p>
+
+        {% if period.schedule_set.exists %}
+            <div style="background-color: rgba(220, 53, 69, 0.1); padding: 15px; border-left: 5px solid #dc3545; border-radius: 4px; margin-bottom: 25px;">
+                <p style="color: #dc3545; font-weight: bold; margin-top: 0;">
+                    【警告】この時限を削除すると、以下の授業データもすべて削除されます：
+                </p>
+                <ul style="margin-bottom: 0; color: var(--text-main);">
+                    {% for schedule in period.schedule_set.all %}
+                        <li style="margin-bottom: 5px;"><strong>{{ schedule.course.name }}</strong>（{{ schedule.day.name }}）</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% else %}
+            <div style="background-color: rgba(40, 167, 69, 0.1); padding: 15px; border-left: 5px solid #28a745; border-radius: 4px; margin-bottom: 25px;">
+                <p style="color: #28a745; margin: 0;">この時限に登録されている授業はありません。安全に削除できます。</p>
+            </div>
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <button type="submit" style="background-color: #dc3545; color: white; padding: 12px 25px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">
+                    削除する
+                </button>
+                <a href="{% url 'schedule:timetable_list' %}" style="text-decoration: none; color: var(--text-sub); font-weight: bold;">
+                    キャンセル
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

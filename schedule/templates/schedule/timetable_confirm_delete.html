@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}時間割セットの削除確認{% endblock %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 0 auto;">
+    <div class="card" style="border: 1px solid #ff4d4f;">
+        <h1 style="color: #ff4d4f; font-size: 1.5em; border-bottom: 2px solid rgba(255, 77, 79, 0.2); padding-bottom: 10px; margin-top: 0;">
+            ⚠️ 時間割セットの削除確認
+        </h1>
+
+        <p style="font-size: 1.1em; margin: 20px 0;">
+            本当に時間割セット「<strong>{{ timetable.name }}</strong>」を削除してもよろしいですか？
+        </p>
+        
+        <div style="background-color: rgba(255, 77, 79, 0.1); padding: 15px; border-left: 5px solid #ff4d4f; border-radius: 8px; margin-bottom: 25px;">
+            <p style="color: #ff4d4f; font-weight: bold; margin-top: 0;">
+                【警告】この操作は取り消せません。
+            </p>
+            <p style="margin-bottom: 0; font-size: 0.9em; color: var(--text-main);">
+                このセットを削除すると、紐づいている全ての曜日、時限、および登録されたすべての授業データが失われます。
+            </p>
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+            <div style="display: flex; gap: 15px; align-items: center;">
+                <button type="submit" style="background-color: #ff4d4f; color: white; padding: 12px 25px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">
+                    削除する
+                </button>
+                <a href="{% url 'schedule:timetable_list' %}" style="text-decoration: none; color: var(--text-sub); font-weight: bold;">
+                    キャンセル
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

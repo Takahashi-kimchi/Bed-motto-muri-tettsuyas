@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if form.instance.pk %}時間割セットの編集{% else %}新しい時間割セットの作成{% endif %}{% endblock %}
+
+{% block content %}
+<div style="max-width: 500px; margin: 0 auto;">
+    <div style="margin-bottom: 20px;">
+        <a href="{% url 'schedule:timetable_list' %}" style="text-decoration: none; color: var(--accent-color); font-weight: bold;">← 一覧に戻る</a>
+    </div>
+
+    <div class="card">
+        <h1 style="font-size: 1.5em; margin-bottom: 25px; color: var(--text-main); border-bottom: 2px solid var(--border-color); padding-bottom: 10px;">
+            {% if form.instance.pk %}📝 時間割セットの編集{% else %}✨ 新しいセットの作成{% endif %}
+        </h1>
+
+        <form method="post">
+            {% csrf_token %}
+            <div style="display: grid; gap: 20px;">
+                {{ form.as_p }}
+            </div>
+            
+            <button type="submit" style="width: 100%; margin-top: 30px; background: var(--accent-color); color: white; padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">
+                保存する
+            </button>
+        </form>
+    </div>
+</div>
+
+<style>
+    input[type="text"], textarea, select { width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--card-bg); color: var(--text-main); box-sizing: border-box; }
+    input[type="checkbox"] { transform: scale(1.2); margin-right: 10px; }
+</style>
+{% endblock %}

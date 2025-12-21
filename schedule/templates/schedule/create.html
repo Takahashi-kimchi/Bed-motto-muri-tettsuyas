@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block title %}授業の追加{% endblock %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 0 auto;">
+    <div style="margin-bottom: 20px;">
+        <a href="{{ back_url }}" style="text-decoration: none; color: var(--accent-color); font-weight: bold;">← 時間割に戻る</a>
+    </div>
+
+    <div class="card">
+        <h1 style="font-size: 1.5em; margin-bottom: 10px; color: var(--text-main);">✨ 新しい授業を追加</h1>
+        <p style="color: var(--text-sub); margin-bottom: 25px;">{{ day.name }} {{ period.name }} に登録します</p>
+
+        <form method="post">
+            {% csrf_token %}
+            <div style="display: grid; gap: 20px;">
+                <div>
+                    <label style="display: block; font-weight: bold; margin-bottom: 8px;">授業名</label>
+                    {{ course_form.name }}
+                </div>
+
+                <div>
+                    <label style="display: block; font-weight: bold; margin-bottom: 8px;">テーマカラー</label>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        {{ course_form.color }}
+                        <div id="color-preview" style="width: 20px; height: 20px; border-radius: 50%; border: 1px solid var(--border-color); background-color: #e2e8f0;"></div>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div>
+                        <label style="display: block; font-weight: bold; margin-bottom: 8px;">担当教員</label>
+                        {{ course_form.instructor }}
+                    </div>
+                    <div>
+                        <label style="display: block; font-weight: bold; margin-bottom: 8px;">教室</label>
+                        {{ course_form.room }}
+                    </div>
+                </div>
+
+                <div>
+                    <label style="display: block; font-weight: bold; margin-bottom: 8px;">概要・メモ</label>
+                    {{ course_form.description }}
+                </div>
+            </div>
+
+            {% if existing_course %}
+                <div style="margin-top: 20px; padding: 15px; background-color: rgba(255, 193, 7, 0.1); border: 1px solid #ffc107; border-radius: 8px; color: var(--text-main);">
+                    <p style="margin: 0; font-weight: bold;">⚠️ 重複注意</p>
+                    <p style="margin: 5px 0; font-size: 0.9em;">「{{ existing_course.name }}」を再利用しますか？</p>
+                    <input type="hidden" name="confirm_reuse" value="true">
+                </div>
+            {% endif %}
+
+            <button type="submit" style="width: 100%; margin-top: 30px; background-color: #28a745; color: white; padding: 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1.1em;">
+                {% if existing_course %}既存のデータで登録{% else %}この内容で新規登録{% endif %}
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+    const colorSelect = document.querySelector('select[name="color"]');
+    const colorPreview = document.getElementById('color-preview');
+    if(colorSelect && colorPreview) {
+        colorSelect.addEventListener('change', (e) => {
+            colorPreview.style.backgroundColor = e.target.value;
+        });
+    }
+</script>
+
+<style>
+    input[type="text"], textarea, select { width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--card-bg); color: var(--text-main); box-sizing: border-box; }
+    textarea { height: 100px; resize: vertical; }
+</style>
+{% endblock %}

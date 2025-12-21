@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if form.instance.pk %}時限を編集{% else %}新しい時限を作成{% endif %}{% endblock %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 0 auto;">
+    <div style="margin-bottom: 20px;">
+        <a href="{% url 'schedule:timetable_list' %}" style="text-decoration: none; color: var(--accent-color); font-weight: bold;">← 設定センターに戻る</a>
+    </div>
+
+    <div class="card">
+        <h1 style="font-size: 1.5em; margin-bottom: 20px; color: var(--text-main); border-bottom: 2px solid var(--border-color); padding-bottom: 10px;">
+            {% if form.instance.pk %}⏰ 時限を編集{% else %}✨ 新しい時限を作成{% endif %}
+        </h1>
+
+        <form method="post">
+            {% csrf_token %}
+            <div style="display: grid; gap: 20px;">
+                <div>
+                    <label style="display: block; font-weight: bold; margin-bottom: 8px;">時限名</label>
+                    {{ form.name }}
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div><label style="display: block; font-weight: bold; margin-bottom: 8px;">開始時間</label>{{ form.start_time }}</div>
+                    <div><label style="display: block; font-weight: bold; margin-bottom: 8px;">終了時間</label>{{ form.end_time }}</div>
+                </div>
+                <div>
+                    <label style="display: block; font-weight: bold; margin-bottom: 8px;">表示順</label>
+                    {{ form.order }}
+                </div>
+            </div>
+
+            <div style="margin-top: 30px; display: flex; gap: 10px;">
+                <button type="submit" style="flex: 2; background: var(--accent-color); color: white; padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">
+                    保存して設定センターへ
+                </button>
+                <a href="{% url 'schedule:timetable_list' %}" 
+                   style="flex: 1; text-align: center; background: var(--bg-color); border: 1px solid var(--border-color); color: var(--text-main); padding: 12px; border-radius: 8px; text-decoration: none; font-weight: bold;">
+                   キャンセル
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    input[type="text"], input[type="time"], input[type="number"] {
+        width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--card-bg); color: var(--text-main); box-sizing: border-box;
+    }
+</style>
+{% endblock %}

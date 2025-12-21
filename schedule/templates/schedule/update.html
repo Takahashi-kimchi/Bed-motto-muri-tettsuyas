@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block title %}授業情報の編集{% endblock %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 0 auto;">
+    <div style="margin-bottom: 20px;">
+        <a href="{% url 'schedule:detail' pk=schedule.pk %}" style="text-decoration: none; color: var(--accent-color);">← 戻る</a>
+    </div>
+
+    <div class="card">
+        <h1 style="font-size: 1.5em; margin-bottom: 20px; color: var(--text-main);">✏️ 授業情報の編集</h1>
+
+        <form method="post">
+            {% csrf_token %}
+            
+            <div style="display: grid; gap: 20px;">
+                <div>
+                    <label style="display: block; font-weight: bold; margin-bottom: 8px;">授業名</label>
+                    {{ course_form.name }}
+                </div>
+
+                <div>
+                    <label style="display: block; font-weight: bold; margin-bottom: 8px;">テーマカラー</label>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        {{ course_form.color }}
+                        <div id="color-preview" style="width: 20px; height: 20px; border-radius: 50%; border: 1px solid var(--border-color); background-color: {{ course_form.color.value }};"></div>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div>
+                        <label style="display: block; font-weight: bold; margin-bottom: 8px;">担当教員</label>
+                        {{ course_form.instructor }}
+                    </div>
+                    <div>
+                        <label style="display: block; font-weight: bold; margin-bottom: 8px;">教室</label>
+                        {{ course_form.room }}
+                    </div>
+                </div>
+
+                <div>
+                    <label style="display: block; font-weight: bold; margin-bottom: 8px;">概要・メモ</label>
+                    {{ course_form.description }}
+                </div>
+
+                <div style="padding: 15px; background: var(--bg-color); border-radius: 8px; border: 1px solid var(--border-color);">
+                    <label style="display: block; font-weight: bold; margin-bottom: 8px;">配置場所</label>
+                    <div style="display: flex; gap: 10px;">
+                        {{ schedule_form.day }} {{ schedule_form.period }}
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 30px; display: flex; gap: 10px;">
+                <button type="submit" style="flex: 2; background: var(--accent-color); color: white; padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">保存する</button>
+                <a href="{% url 'schedule:detail' pk=schedule.pk %}" style="flex: 1; text-align: center; background: var(--border-color); color: var(--text-main); padding: 12px; border-radius: 8px; text-decoration: none;">キャンセル</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    const colorSelect = document.querySelector('select[name="color"]');
+    const colorPreview = document.getElementById('color-preview');
+    if(colorSelect && colorPreview) {
+        colorSelect.addEventListener('change', (e) => {
+            colorPreview.style.backgroundColor = e.target.value;
+        });
+    }
+</script>
+
+<style>
+    input[type="text"], textarea, select {
+        width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--card-bg); color: var(--text-main);
+    }
+    textarea { height: 100px; }
+</style>
+{% endblock %}
