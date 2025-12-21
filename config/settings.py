@@ -81,10 +81,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 # 【変更】デフォルトはSQLite。環境変数 DATABASE_URL があればPostgreSQLに上書き
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.parse('postgresql://neondb_owner:npg_cFhQrVb41PaT@ep-wild-bird-a1lc7xa2-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require')
 }
 
 # Renderなどのクラウド環境用のDB設定を読み込む

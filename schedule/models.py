@@ -2,6 +2,7 @@
 
 from django.db import models
 from django.contrib.auth.models import User # Django標準のUserモデルをインポート
+from django.core.exceptions import ValidationError
 
 class Timetable(models.Model):
     """ユーザーが管理する時間割のセット（例: '前期時間割', '後期時間割' など）"""
@@ -33,6 +34,18 @@ class Day(models.Model):
     def __str__(self):
         return self.name
 
+    def clean(self):
+        super().clean()
+        # 同じ時間割の中に、同じ順序(order)の曜日が既にないかチェック
+        # (ただし、自分自身を編集している場合は除外する)
+        existing = Day.objects.filter(
+            timetable=self.timetable,
+            order=self.order
+        ).exclude(pk=self.pk)
+
+        if existing.exists():
+            raise ValidationError({'order': 'この順番は既に使用されています。別の番号にしてください。'})
+
 # 2. 時限 (Period) マスタ：柔軟な時限数の変更に対応
 class Period(models.Model):
     """時限または時間割の行"""
@@ -51,6 +64,17 @@ class Period(models.Model):
 
     def __str__(self):
         return self.name
+
+    def clean(self):
+        super().clean()
+        # 同じ時間割の中に、同じ順序(order)の時限が既にないかチェック
+        existing = Period.objects.filter(
+            timetable=self.timetable,
+            order=self.order
+        ).exclude(pk=self.pk)
+
+        if existing.exists():
+            raise ValidationError({'order': 'この順番は既に使用されています。別の番号にしてください。'})
 
 # 3. 授業 (Course) 詳細：時間割を構成する授業の情報
 class Course(models.Model):
