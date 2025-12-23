@@ -15,8 +15,9 @@
         <form method="post">
             {% csrf_token %}
 
+            {# ========== 重複警告エリア ========== #}
             {% if existing_course %}
-                <div style="margin-bottom: 30px; padding: 20px; background-color: #fff3cd; border: 2px solid #ffecb5; border-radius: 12px; color: #856404;">
+                <div id="duplicate-warning" style="margin-bottom: 30px; padding: 20px; background-color: #fff3cd; border: 2px solid #ffecb5; border-radius: 12px; color: #856404;">
                     <h3 style="margin-top: 0; display: flex; align-items: center; gap: 10px; font-size: 1.2em;">
                         ⚠️ 登録済みの授業が見つかりました
                     </h3>
@@ -42,16 +43,18 @@
 
                     <div style="display: flex; gap: 10px; flex-direction: column;">
                         <button type="submit" name="confirm_reuse" value="true" style="background-color: #856404; color: white; padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">
-                            はい、このデータを紐付ける (推奨)
+                            このデータを紐付ける (推奨)
                         </button>
-                        <button type="button" onclick="document.querySelector('input[name=name]').focus();" style="background-color: transparent; border: 1px solid #856404; color: #856404; padding: 10px; border-radius: 6px; cursor: pointer;">
-                            いいえ、別の授業として登録する (情報を修正)
+                        <button type="button" onclick="unlockForm()" style="background-color: transparent; border: 1px solid #856404; color: #856404; padding: 10px; border-radius: 6px; cursor: pointer;">
+                            別の授業として登録する (情報を修正)
                         </button>
                     </div>
                 </div>
             {% endif %}
 
-            <div style="display: grid; gap: 20px; {% if existing_course %}opacity: 0.6; pointer-events: none;{% endif %}">
+            {# ========== 入力フォームエリア (IDを追加) ========== #}
+            <div id="input-fields" style="display: grid; gap: 20px; transition: all 0.3s; {% if existing_course %}opacity: 0.5; pointer-events: none; filter: grayscale(100%);{% endif %}">
+                
                 <div>
                     <label style="display: block; font-weight: bold; margin-bottom: 8px;">授業名</label>
                     {{ course_form.name }}
@@ -71,4 +74,57 @@
                         {{ course_form.instructor }}
                     </div>
                     <div>
-                        <label style="
+                        <label style="display: block; font-weight: bold; margin-bottom: 8px;">教室</label>
+                        {{ course_form.room }}
+                    </div>
+                </div>
+
+                <div>
+                    <label style="display: block; font-weight: bold; margin-bottom: 8px;">概要・メモ</label>
+                    {{ course_form.description }}
+                </div>
+                
+                <button type="submit" style="width: 100%; margin-top: 10px; background-color: #28a745; color: white; padding: 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1.1em;">
+                    この内容で新規登録
+                </button>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<script>
+    // 色プレビュー機能
+    const colorSelect = document.querySelector('select[name="color"]');
+    const colorPreview = document.getElementById('color-preview');
+    if(colorSelect && colorPreview) {
+        colorPreview.style.backgroundColor = colorSelect.value;
+        colorSelect.addEventListener('change', (e) => {
+            colorPreview.style.backgroundColor = e.target.value;
+        });
+    }
+
+    // フォームのロック解除機能
+    function unlockForm() {
+        const inputArea = document.getElementById('input-fields');
+        const warningArea = document.getElementById('duplicate-warning');
+        
+        // 警告エリアを非表示にする（アニメーション的に消す）
+        warningArea.style.display = 'none';
+
+        // 入力エリアのロックを解除
+        inputArea.style.opacity = '1';
+        inputArea.style.pointerEvents = 'auto';
+        inputArea.style.filter = 'none';
+
+        // 名前入力欄にフォーカス
+        const nameInput = document.querySelector('input[name="name"]');
+        if(nameInput) nameInput.focus();
+    }
+</script>
+
+<style>
+    input[type="text"], textarea, select { width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--card-bg); color: var(--text-main); box-sizing: border-box; }
+    textarea { height: 100px; resize: vertical; }
+</style>
+{% endblock %}

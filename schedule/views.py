@@ -212,12 +212,12 @@ def schedule_update_view(request, pk):
     if request.method == 'POST':
         schedule_form = ScheduleUpdateForm(request.POST, instance=schedule_obj, timetable=schedule_obj.day.timetable)
         course_form = CourseForm(request.POST, instance=schedule_obj.course)
+        
         if schedule_form.is_valid() and course_form.is_valid():
             new_day = schedule_form.cleaned_data.get('day')
             new_period = schedule_form.cleaned_data.get('period')
 
-            # 「同じユーザー」で、「指定された曜日・時限」に授業があるか探す
-            # ただし「自分自身(exclude(pk=pk))」は除外する（同じ場所に保存するのはOKだから）
+            # 重複チェック
             conflict_exists = Schedule.objects.filter(
                 user=request.user,
                 day=new_day,
@@ -225,14 +225,16 @@ def schedule_update_view(request, pk):
             ).exclude(pk=schedule_obj.pk).exists()
 
             if conflict_exists:
-                # 重複がある場合 -> エラーを追加して保存せずに画面に戻す
+                # 重複がある場合 -> エラーを追加 (保存しない)
+                # ★ここ重要: ここで return redirect してはいけません！下の return render に流します。
                 schedule_form.add_error(None, "⚠️ その曜日・時限には既に別の授業が登録されています！")
             else:
                 # 重複がない場合 -> 保存して完了
                 schedule_form.save()
                 course_form.save()
                 return redirect('schedule:detail', pk=schedule_obj.pk)
-            return redirect('schedule:detail', pk=schedule_obj.pk)
+            
+
     else:
         schedule_form = ScheduleUpdateForm(instance=schedule_obj, timetable=schedule_obj.day.timetable)
         course_form = CourseForm(instance=schedule_obj.course)
