@@ -37,13 +37,20 @@ def time_table_view(request, timetable_pk=None):
 
     # 1. 表示する時間割セットの特定
     current_timetable = None
+    # ① URLで直接指定された場合 (例: /schedule/5/) -> 最優先
     if timetable_pk:
         current_timetable = Timetable.objects.filter(pk=timetable_pk, user=request.user).first()
+
+    # ② URL指定なし(トップページ等) -> 「デフォルト(is_default=True)」を探す
+    if not current_timetable:
+        current_timetable = Timetable.objects.filter(user=request.user, is_default=True).first()
+
+    # ③ デフォルト未設定の場合 -> セッション（前回の記憶）を確認
     if not current_timetable and 'current_timetable_pk' in request.session:
         session_pk = request.session['current_timetable_pk']
         current_timetable = Timetable.objects.filter(pk=session_pk, user=request.user).first()
-    if not current_timetable:
-        current_timetable = Timetable.objects.filter(user=request.user, is_default=True).first()
+
+    # ④ それでもない場合 -> とりあえず「一番新しい時間割」を表示
     if not current_timetable:
         current_timetable = Timetable.objects.filter(user=request.user).order_by('pk').first()
 
@@ -273,6 +280,10 @@ class TimetableCreateView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         # 1. ユーザーをセットして保存
         form.instance.user = self.request.user
+
+        if form.instance.is_default:
+            Timetable.objects.filter(user=self.request.user).update(is_default=False)
+        
         response = super().form_valid(form)
         
         # 保存された新しい時間割を取得
@@ -327,6 +338,14 @@ class TimetableUpdateView(LoginRequiredMixin, UserDataMixin, UpdateView):
     form_class = TimetableForm
     template_name = 'schedule/timetable_form.html'
     success_url = reverse_lazy('schedule:timetable_list')
+
+    def form_valid(self, form):
+        # もし「デフォルトにする」にチェックが入っていたら
+        if form.instance.is_default:
+            # 自分以外のすべての時間割のデフォルトを解除する
+            Timetable.objects.filter(user=self.request.user).exclude(pk=self.object.pk).update(is_default=False)
+        
+        return super().form_valid(form)
 
 class TimetableDeleteView(LoginRequiredMixin, UserDataMixin, DeleteView):
     model = Timetable
