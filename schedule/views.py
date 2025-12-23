@@ -159,7 +159,7 @@ def schedule_create_view(request, day_pk, period_pk):
             existing_course = Course.objects.filter(
                 name=course_name, 
                 instructor=instructor_name, # 条件に追加
-                schedule__user=request.user
+                schedule__user=request.user,
             ).distinct().first()
 
         if existing_course and not confirm_reuse:
