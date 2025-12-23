@@ -38,7 +38,7 @@ def time_table_view(request, timetable_pk=None):
     # 1. 表示する時間割セットの特定
     current_timetable = None
     if timetable_pk:
-        current_timetable = get_object_or_404(Timetable, pk=timetable_pk, user=request.user)
+        current_timetable = Timetable.objects.filter(pk=timetable_pk, user=request.user).first()
     if not current_timetable and 'current_timetable_pk' in request.session:
         session_pk = request.session['current_timetable_pk']
         current_timetable = Timetable.objects.filter(pk=session_pk, user=request.user).first()
