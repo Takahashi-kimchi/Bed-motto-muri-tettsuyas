@@ -7,7 +7,7 @@ from django.core.exceptions import ValidationError
 class Timetable(models.Model):
     """ユーザーが管理する時間割のセット（例: '前期時間割', '後期時間割' など）"""
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, verbose_name="時間割名")
     is_default = models.BooleanField(default=False) # デフォルトとして使用するか
     
     class Meta:
