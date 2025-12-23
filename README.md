@@ -1,7 +1,7 @@
 # Timetable SaaS Project (時間割管理アプリ)
 
 **Group Name:** ベッド・モット・ムリ・テッツヤーズ
-**App URL:** https://timetable-saas.onrender.com/
+**App URL:** https://timetable-y91y.onrender.com/
 > **Note:** 無料プランのサーバー(Render Free Tier)を使用しているため、
 > **最初のアクセス時は起動に約50秒〜1分かかります。エラーではありませんのでご安心ください。**
 
