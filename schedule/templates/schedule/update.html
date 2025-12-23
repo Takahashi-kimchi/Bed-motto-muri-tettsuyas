@@ -11,6 +11,7 @@
     <div class="card">
         <h1 style="font-size: 1.5em; margin-bottom: 20px; color: var(--text-main);">✏️ 授業情報の編集</h1>
 
+        {# エラーメッセージ表示エリア #}
         {% if schedule_form.non_field_errors %}
         <div style="background-color: #ffebee; color: #c62828; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #ef9a9a;">
             {% for error in schedule_form.non_field_errors %}
@@ -62,10 +63,22 @@
                 </div>
             </div>
 
-            <div style="margin-top: 30px; display: flex; gap: 10px;">
-                <button type="submit" style="flex: 2; background: var(--accent-color); color: white; padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">保存する</button>
-                <a href="{% url 'schedule:detail' pk=schedule.pk %}" style="flex: 1; text-align: center; background: var(--border-color); color: var(--text-main); padding: 12px; border-radius: 8px; text-decoration: none;">キャンセル</a>
+            <div style="margin-top: 30px; display: flex; gap: 10px; align-items: center;">
+                <button type="submit" style="flex: 2; background: var(--accent-color); color: white; padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">
+                    保存する
+                </button>
+                
+                <a href="{% url 'schedule:detail' pk=schedule.pk %}" style="flex: 1; text-align: center; background: var(--border-color); color: var(--text-main); padding: 12px; border-radius: 8px; text-decoration: none;">
+                    キャンセル
+                </a>
+
+                <a href="{% url 'schedule:delete' pk=schedule.pk %}" 
+                   onclick="return confirm('本当にこの授業を削除してもよろしいですか？\n\n※この授業が他の曜日でも使われている場合は、このコマだけが削除されます。\n※他で使われていない場合は、授業データも完全に削除されます。');"
+                   style="flex: 0.8; text-align: center; background: #ffebee; color: #c62828; border: 1px solid #ffcdd2; padding: 12px; border-radius: 8px; text-decoration: none; font-weight: bold; white-space: nowrap;">
+                    🗑️ 削除
+                </a>
             </div>
+
         </form>
     </div>
 </div>
