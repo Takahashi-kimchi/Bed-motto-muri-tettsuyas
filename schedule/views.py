@@ -298,18 +298,18 @@ class TimetableCreateView(LoginRequiredMixin, CreateView):
         
         else:
             # 直前の時間割がない場合（初めての作成） -> デフォルトを作成
-            default_days = ['月', '火', '水', '木', '金']
+            default_days = ['月', '火', '水', '木', '金', '土']
             default_periods = ['1限', '2限', '3限', '4限', '5限']
             
             for i, name in enumerate(default_days):
                 Day.objects.create(timetable=new_timetable, name=name, order=i+1)
             
             default_periods = [
-                {'name': '1限', 'start': time(9, 0),  'end': time(10, 30)},
-                {'name': '2限', 'start': time(10, 40), 'end': time(12, 10)},
-                {'name': '3限', 'start': time(13, 0),  'end': time(14, 30)},
-                {'name': '4限', 'start': time(14, 40), 'end': time(16, 10)},
-                {'name': '5限', 'start': time(16, 20), 'end': time(17, 50)},
+                {'name': '1限', 'start': time(9, 20),  'end': time(11, 00)},
+                {'name': '2限', 'start': time(11, 10), 'end': time(12, 50)},
+                {'name': '3限', 'start': time(13, 40),  'end': time(15, 20)},
+                {'name': '4限', 'start': time(15, 30), 'end': time(17, 10)},
+                {'name': '5限', 'start': time(17, 20), 'end': time(19, 00)},
             ]
 
             for i, p_data in enumerate(default_periods):
