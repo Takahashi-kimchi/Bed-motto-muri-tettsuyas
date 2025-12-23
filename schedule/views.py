@@ -8,7 +8,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils import timezone
 from django.core.exceptions import PermissionDenied
-from django.shortcuts import get_object_or_404
+from datetime import time
 
 from .models import Day, Period, Schedule, Course, Task, Timetable
 from .forms import (
@@ -288,7 +288,13 @@ class TimetableCreateView(LoginRequiredMixin, CreateView):
                 Day.objects.create(timetable=new_timetable, name=day.name, order=day.order)
             
             for period in latest_timetable.period_set.all():
-                Period.objects.create(timetable=new_timetable, name=period.name, order=period.order)
+                Period.objects.create(
+                    timetable=new_timetable, 
+                    name=period.name, 
+                    order=period.order,
+                    start_time=period.start_time,
+                    end_time=period.end_time,
+                )
         
         else:
             # 直前の時間割がない場合（初めての作成） -> デフォルトを作成
@@ -298,9 +304,22 @@ class TimetableCreateView(LoginRequiredMixin, CreateView):
             for i, name in enumerate(default_days):
                 Day.objects.create(timetable=new_timetable, name=name, order=i+1)
             
-            for i, name in enumerate(default_periods):
-                Period.objects.create(timetable=new_timetable, name=name, order=i+1)
+            default_periods = [
+                {'name': '1限', 'start': time(9, 0),  'end': time(10, 30)},
+                {'name': '2限', 'start': time(10, 40), 'end': time(12, 10)},
+                {'name': '3限', 'start': time(13, 0),  'end': time(14, 30)},
+                {'name': '4限', 'start': time(14, 40), 'end': time(16, 10)},
+                {'name': '5限', 'start': time(16, 20), 'end': time(17, 50)},
+            ]
 
+            for i, p_data in enumerate(default_periods):
+                Period.objects.create(
+                    timetable=new_timetable, 
+                    name=p_data['name'], 
+                    order=i+1,
+                    start_time=p_data['start'],
+                    end_time=p_data['end'],
+                )
         return response
 
 class TimetableUpdateView(LoginRequiredMixin, UserDataMixin, UpdateView):
