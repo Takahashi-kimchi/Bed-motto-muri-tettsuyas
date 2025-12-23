@@ -1,6 +1,6 @@
 # Timetable SaaS Project (時間割管理アプリ)
 
-**Group Name:** [記述: ここにグループ名を入力してください]
+**Group Name:** ベッド・モット・ムリ・テッツヤーズ
 **App URL:** https://timetable-saas.onrender.com/
 > **Note:** 無料プランのサーバー(Render Free Tier)を使用しているため、
 > **最初のアクセス時は起動に約50秒〜1分かかります。エラーではありませんのでご安心ください。**
@@ -57,7 +57,41 @@ GitHub Projects (Kanban Board) を活用し、タスクの可視化と進捗管�
 クラウドネイティブな **Web 3層構造 (Web 3 Layer Architecture)** を採用しました。
 
 ### Architecture Diagram
-![System Architecture]([画像: ここにMermaidで作った「システム構成図」の画像を貼ってください])
+
+```mermaid
+graph LR
+    User(("User<br/>(PC / Mobile)"))
+    DNS{"DNS<br/>onrender.com"}
+    
+    subgraph "Application Server (Render)"
+        LB["Load Balancer<br/>(Render Proxy)"]
+        Gunicorn["WSGI Server<br/>(Gunicorn)"]
+        Django["Web App<br/>(Django Framework)"]
+        Static["Static Files<br/>(WhiteNoise)"]
+    end
+    
+    subgraph "Database Server (Neon)"
+        DB[("RDBMS<br/>PostgreSQL")]
+    end
+
+    %% データの流れ
+    User -- HTTPS Request --> DNS
+    DNS --> LB
+    LB --> Gunicorn
+    Gunicorn --> Django
+    
+    Django -- SQL Query --> DB
+    DB -- Result Data --> Django
+    
+    Django -- Read CSS/JS --> Static
+    Django -- HTML Response --> User
+
+    %% スタイル定義
+    style User fill:#f9f,stroke:#333
+    style Django fill:#bbf,stroke:#333
+    style DB fill:#bfb,stroke:#333
+
+```
 
 ### Non-Functional Requirements (非機能要件の定義)
 * **RPO (Recovery Point Objective):** 24時間
@@ -74,7 +108,51 @@ GitHub Projects (Kanban Board) を活用し、タスクの可視化と進捗管�
 データの整合性を最優先し、リレーショナルデータベース (PostgreSQL) を採用しました。
 
 ### ER Diagram
-![ER Diagram]([画像: ここにMermaidで作った「ER図」の画像を貼ってください])
+```mermaid
+erDiagram
+    %% 定義
+    User ||--o{ Timetable : "Creates"
+    Timetable ||--|{ Day : "Has"
+    Timetable ||--|{ Period : "Has"
+    Day ||--o{ Schedule : "Contains"
+    Period ||--o{ Schedule : "Contains"
+
+    %% テーブル詳細
+    User {
+        int id PK
+        string username
+        string password_hash
+    }
+
+    Timetable {
+        int id PK
+        string name "Semester Name"
+        boolean is_default
+        int user_id FK
+    }
+
+    Day {
+        int id PK
+        string name "Mon/Tue"
+        int order
+        int timetable_id FK
+    }
+
+    Period {
+        int id PK
+        string name "1st/2nd"
+        int order
+        int timetable_id FK
+    }
+
+    Schedule {
+        int id PK
+        string subject
+        string memo
+        int day_id FK
+        int period_id FK
+    }
+```
 
 ### Key Database Features (評価ポイント)
 * **Normalization (正規化):**
