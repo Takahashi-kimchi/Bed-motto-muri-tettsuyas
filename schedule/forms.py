@@ -109,7 +109,7 @@ class TimetableForm(forms.ModelForm):
         # nameとis_default（デフォルトとして使用するか）を編集可能にする
         fields = ['name', 'is_default']
         labels = {
-            'name': '授業名',
+            'name': '時間割名',
             'is_default': 'デフォルトとして使用',
         }
 
