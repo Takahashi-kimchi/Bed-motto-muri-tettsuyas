@@ -59,6 +59,7 @@ GitHub Projects (Kanban Board) を活用し、タスクの可視化と進捗管�
 ### Architecture Diagram
 
 ```mermaid
+%%{init: {'theme': 'neutral'} }%%
 graph LR
     User(("User<br/>(PC / Mobile)"))
     DNS{"DNS<br/>onrender.com"}
@@ -109,6 +110,7 @@ graph LR
 
 ### ER Diagram
 ```mermaid
+%%{init: {'theme': 'neutral'} }%%
 erDiagram
     %% 定義
     User ||--o{ Timetable : "Creates"
