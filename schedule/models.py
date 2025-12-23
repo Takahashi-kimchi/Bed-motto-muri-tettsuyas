@@ -49,8 +49,6 @@ class Day(models.Model):
 # 2. 時限 (Period) マスタ：柔軟な時限数の変更に対応
 class Period(models.Model):
     """時限または時間割の行"""
-    # user フィールドを削除し、timetable に置き換える
-    # user = models.ForeignKey(User, on_delete=models.CASCADE) 👈 これを削除
     timetable = models.ForeignKey(Timetable, on_delete=models.CASCADE) # 👈 これを追加
     name = models.CharField(max_length=50)
     start_time = models.TimeField()
