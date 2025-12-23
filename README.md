@@ -1,7 +1,8 @@
-# Timetable SaaS Project (時間割管理アプリ)
+# 時間割管理アプリ
 
 **Group Name:** ベッド・モット・ムリ・テッツヤーズ
-**App URL:** https://timetable-y91y.onrender.com/
+> **Group Member:** 髙橋響(2442051)、西村優輝(2442064)、本間央樹(2442076)、横井仁(2442091)
+> **App URL:** https://timetable-y91y.onrender.com/
 > **Note:** 無料プランのサーバー(Render Free Tier)を使用しているため、
 > **起動に約1分かかることがありますが、エラーではありませんのでご安心ください。**
 
