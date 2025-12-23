@@ -11,6 +11,16 @@
     <div class="card">
         <h1 style="font-size: 1.5em; margin-bottom: 20px; color: var(--text-main);">✏️ 授業情報の編集</h1>
 
+        {% if schedule_form.non_field_errors %}
+        <div style="background-color: #ffebee; color: #c62828; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #ef9a9a;">
+            {% for error in schedule_form.non_field_errors %}
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span>{{ error }}</span>
+                </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
         <form method="post">
             {% csrf_token %}
             
