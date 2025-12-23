@@ -269,9 +269,39 @@ class TimetableCreateView(LoginRequiredMixin, CreateView):
     form_class = TimetableForm
     template_name = 'schedule/timetable_form.html'
     success_url = reverse_lazy('schedule:timetable_list')
+
     def form_valid(self, form):
+        # 1. ユーザーをセットして保存
         form.instance.user = self.request.user
-        return super().form_valid(form)
+        response = super().form_valid(form)
+        
+        # 保存された新しい時間割を取得
+        new_timetable = self.object
+
+        # 2. 直前の時間割構成を引き継ぐロジック
+        # 今作ったもの以外で、このユーザーの一番新しい時間割を探す
+        latest_timetable = Timetable.objects.filter(user=self.request.user).exclude(pk=new_timetable.pk).order_by('-pk').first()
+
+        if latest_timetable:
+            # 直前の時間割がある場合 -> その曜日と時限構成をコピーする
+            for day in latest_timetable.day_set.all():
+                Day.objects.create(timetable=new_timetable, name=day.name, order=day.order)
+            
+            for period in latest_timetable.period_set.all():
+                Period.objects.create(timetable=new_timetable, name=period.name, order=period.order)
+        
+        else:
+            # 直前の時間割がない場合（初めての作成） -> デフォルトを作成
+            default_days = ['月', '火', '水', '木', '金']
+            default_periods = ['1限', '2限', '3限', '4限', '5限']
+            
+            for i, name in enumerate(default_days):
+                Day.objects.create(timetable=new_timetable, name=name, order=i+1)
+            
+            for i, name in enumerate(default_periods):
+                Period.objects.create(timetable=new_timetable, name=name, order=i+1)
+
+        return response
 
 class TimetableUpdateView(LoginRequiredMixin, UserDataMixin, UpdateView):
     model = Timetable
