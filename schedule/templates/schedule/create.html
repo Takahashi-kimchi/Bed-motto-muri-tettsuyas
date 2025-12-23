@@ -14,7 +14,46 @@
 
         <form method="post">
             {% csrf_token %}
-            <div style="display: grid; gap: 20px;">
+
+            {# ========== ★ここから修正: 重複警告エリア ========== #}
+            {% if existing_course %}
+                <div style="margin-bottom: 30px; padding: 20px; background-color: #fff3cd; border: 2px solid #ffecb5; border-radius: 12px; color: #856404;">
+                    <h3 style="margin-top: 0; display: flex; align-items: center; gap: 10px; font-size: 1.2em;">
+                        ⚠️ 登録済みの授業が見つかりました
+                    </h3>
+                    <p style="font-size: 0.95em; margin-bottom: 15px;">
+                        同じ名前・同じ担当教員の授業が既にデータベースにあります。<br>
+                        既存のデータを再利用しますか？
+                    </p>
+
+                    <div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid #e0e0e0; display: flex; gap: 15px; align-items: center; margin-bottom: 15px;">
+                        <div style="width: 40px; height: 40px; border-radius: 50%; background-color: {{ existing_course.color }}; border: 1px solid rgba(0,0,0,0.1);"></div>
+                        <div>
+                            <div style="font-weight: bold; font-size: 1.1em; color: var(--text-main);">{{ existing_course.name }}</div>
+                            <div style="font-size: 0.9em; color: var(--text-sub);">
+                                教員: {{ existing_course.instructor|default:"指定なし" }} / 教室: {{ existing_course.room|default:"指定なし" }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="font-size: 0.9em; margin-bottom: 20px;">
+                        <strong>💡 再利用するメリット:</strong><br>
+                        課題(ToDo)やメモが、他の曜日のコマと自動的に共有・同期されます。
+                    </div>
+
+                    <div style="display: flex; gap: 10px; flex-direction: column;">
+                        <button type="submit" name="confirm_reuse" value="true" style="background-color: #856404; color: white; padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">
+                            はい、このデータを紐付ける (推奨)
+                        </button>
+                        <button type="button" onclick="document.querySelector('input[name=name]').focus();" style="background-color: transparent; border: 1px solid #856404; color: #856404; padding: 10px; border-radius: 6px; cursor: pointer;">
+                            いいえ、別の授業として登録する (情報を修正)
+                        </button>
+                    </div>
+                </div>
+            {% endif %}
+            {# ========== 修正ここまで ========== #}
+
+            <div style="display: grid; gap: 20px; {% if existing_course %}opacity: 0.6; pointer-events: none;{% endif %}">
                 <div>
                     <label style="display: block; font-weight: bold; margin-bottom: 8px;">授業名</label>
                     {{ course_form.name }}
@@ -34,44 +73,4 @@
                         {{ course_form.instructor }}
                     </div>
                     <div>
-                        <label style="display: block; font-weight: bold; margin-bottom: 8px;">教室</label>
-                        {{ course_form.room }}
-                    </div>
-                </div>
-
-                <div>
-                    <label style="display: block; font-weight: bold; margin-bottom: 8px;">概要・メモ</label>
-                    {{ course_form.description }}
-                </div>
-            </div>
-
-            {% if existing_course %}
-                <div style="margin-top: 20px; padding: 15px; background-color: rgba(255, 193, 7, 0.1); border: 1px solid #ffc107; border-radius: 8px; color: var(--text-main);">
-                    <p style="margin: 0; font-weight: bold;">⚠️ 重複注意</p>
-                    <p style="margin: 5px 0; font-size: 0.9em;">「{{ existing_course.name }}」を再利用しますか？</p>
-                    <input type="hidden" name="confirm_reuse" value="true">
-                </div>
-            {% endif %}
-
-            <button type="submit" style="width: 100%; margin-top: 30px; background-color: #28a745; color: white; padding: 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1.1em;">
-                {% if existing_course %}既存のデータで登録{% else %}この内容で新規登録{% endif %}
-            </button>
-        </form>
-    </div>
-</div>
-
-<script>
-    const colorSelect = document.querySelector('select[name="color"]');
-    const colorPreview = document.getElementById('color-preview');
-    if(colorSelect && colorPreview) {
-        colorSelect.addEventListener('change', (e) => {
-            colorPreview.style.backgroundColor = e.target.value;
-        });
-    }
-</script>
-
-<style>
-    input[type="text"], textarea, select { width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--card-bg); color: var(--text-main); box-sizing: border-box; }
-    textarea { height: 100px; resize: vertical; }
-</style>
-{% endblock %}
+                        <label style="
