@@ -67,6 +67,7 @@
             align-items: center;
             justify-content: center;
             box-shadow: 0 4px 6px var(--shadow);
+            white-space: nowrap; /* ボタン内の文字改行を禁止 */
         }
 
         .logout-btn {
@@ -77,19 +78,56 @@
             cursor: pointer;
             padding: 4px 12px;
             font-size: 0.8em;
+            white-space: nowrap; /* ログアウトボタンも改行禁止 */
         }
 
         .container { padding: 20px; max-width: 1200px; margin: 0 auto; }
         .card { background: var(--card-bg); border-radius: 12px; box-shadow: 0 4px 6px var(--shadow); padding: 20px; color: var(--text-main); transition: 0.3s; }
+
+        /* === 📱 スマホ用ヘッダー崩れ防止 === */
+        @media (max-width: 600px) {
+            header {
+                padding: 10px 15px; /* 余白を少し減らす */
+            }
+
+            /* 1. ユーザー名「〇〇さん」を非表示にしてスペース確保 */
+            .user-info span {
+                display: none; 
+            }
+            
+            /* 2. 区切り線を消して隙間を詰める */
+            .user-info {
+                border-left: none !important;
+                padding-left: 0 !important;
+                gap: 8px !important;
+            }
+
+            /* 3. ボタンの文字サイズを小さくする */
+            #theme-toggle {
+                font-size: 0.7em;
+                padding: 6px 12px;
+            }
+            .logout-btn {
+                font-size: 0.7em;
+                padding: 4px 8px;
+            }
+
+            /* 4. ヘッダー内の要素間隔を調整 */
+            header > div:last-child {
+                gap: 8px !important;
+            }
+        }
     </style>
 </head>
 <body>
     <header>
-        <div style="font-weight: bold; color: var(--accent-color); font-size: 1.2em;">📘 時間割</div>
+        <div style="font-weight: bold; color: var(--accent-color); font-size: 1.2em; white-space: nowrap;">📘 時間割</div>
+        
         <div style="display: flex; align-items: center; gap: 15px;">
             <button id="theme-toggle"><span id="theme-text">ダークモードに変更</span></button>
+            
             {% if user.is_authenticated %}
-                <div style="display: flex; align-items: center; gap: 12px; border-left: 2px solid var(--border-color); padding-left: 15px;">
+                <div class="user-info" style="display: flex; align-items: center; gap: 12px; border-left: 2px solid var(--border-color); padding-left: 15px;">
                     <span style="font-size: 0.9em; font-weight: bold;">{{ user.username }}さん</span>
                     <form method="post" action="{% url 'logout' %}" style="display: inline;">
                         {% csrf_token %}<button type="submit" class="logout-btn">ログアウト</button>
@@ -110,10 +148,10 @@
         const applyTheme = (theme) => {
             if (theme === "dark") {
                 html.setAttribute("data-theme", "dark");
-                if(themeText) themeText.innerText = "☀️ライトモードに変更";
+                if(themeText) themeText.innerText = "☀️ ライトに変更"; // スマホ用に文字を短くしました
             } else {
                 html.removeAttribute("data-theme");
-                if(themeText) themeText.innerText = "🌙ダークモードに変更";
+                if(themeText) themeText.innerText = "🌙 ダークに変更"; // スマホ用に文字を短くしました
             }
         };
         const savedTheme = localStorage.getItem("theme");
