@@ -9,7 +9,11 @@ class CourseForm(forms.ModelForm):
         model = Course
         fields = ['name', 'instructor', 'room', 'description', 'color'] # colorを追加
         widgets = {
-            'color': forms.Select(attrs={'class': 'form-control'}), # セレクトボックスにする
+            'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '授業名'}),
+            'instructor': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '担当教員'}),
+            'room': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '教室 (例: 302)'}),
+            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'メモ・備考'}),
+            'color': forms.Select(choices=Course.COLOR_CHOICES, attrs={'class': 'form-control'}),
         }
         labels = {
             'name': '授業名',
