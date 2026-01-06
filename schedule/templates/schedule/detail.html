@@ -65,13 +65,13 @@
                        style="text-decoration: none; font-size: 0.8em; padding: 6px 12px; border-radius: 6px; font-weight: bold; 
                               {% if task.is_completed %}background: #e2e8f0; color: #64748b; border: 1px solid #cbd5e1;
                               {% else %}background: #dcfce7; color: #166534; border: 1px solid #86efac;{% endif %}">
-                        {% if task.is_completed %}↩️ 戻す{% else %}✅ 完了{% endif %}
+                        {% if task.is_completed %}↩️ 未完了に戻す{% else %}✅ 完了{% endif %}
                     </a>
                     
                     <a href="{% url 'schedule:task_delete' pk=task.pk %}" 
                        style="text-decoration: none; font-size: 0.8em; padding: 6px 12px; border-radius: 6px; background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; font-weight: bold;" 
                        onclick="return confirm('本当にこのタスクを削除しますか？')">
-                        🗑️
+                        🗑️削除
                     </a>
                 </div>
             </div>
