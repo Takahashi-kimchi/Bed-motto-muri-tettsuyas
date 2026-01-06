@@ -91,12 +91,9 @@ def time_table_view(request, timetable_pk=None):
                     elif incomplete_tasks.filter(due_date__lte=next_week).exists():
                         urgency = 'weekly'
 
-                    if show_all:
-                        display_total = task_query.count()
-                        display_completed = task_query.filter(is_completed=True).count()
-                    else:
-                        display_total = incomplete_tasks.count()
-                        display_completed = 0
+                    # タスク数集計
+                    display_total = task_query.count()
+                    display_completed = task_query.filter(is_completed=True).count()
 
                 schedule_data[day.pk][period.pk] = {
                     'schedule': schedule_obj,

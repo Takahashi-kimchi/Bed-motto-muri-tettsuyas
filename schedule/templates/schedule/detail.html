@@ -6,10 +6,14 @@
 <style>
     /* 詳細画面専用のスタイル */
     .detail-card { border-top: 5px solid {{ course.color|default:'#007bff' }}; }
-    .task-item { border-bottom: 1px solid var(--border-color); padding: 10px 0; }
+    .task-item { border-bottom: 1px solid var(--border-color); padding: 12px 0; }
     .task-item:last-child { border-bottom: none; }
     .meta-label { font-size: 0.85em; color: var(--text-sub); margin-bottom: 4px; }
     .meta-value { font-weight: bold; margin-bottom: 15px; }
+    
+    /* 完了済みタスクのスタイル */
+    .task-completed { opacity: 0.6; background-color: var(--bg-color); }
+    .task-completed .task-title { text-decoration: line-through; color: var(--text-sub); }
 </style>
 
 <div style="margin-bottom: 20px;">
@@ -19,7 +23,7 @@
 <div class="card detail-card">
     <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
         <h1 style="margin: 0; font-size: 1.8em;">{{ course.name }}</h1>
-        <a href="{% url 'schedule:update' pk=schedule.pk %}" class="card" style="padding: 8px 15px; text-decoration: none; font-size: 0.9em; background: var(--bg-color); border: 1px solid var(--border-color);">✏️ 編集</a>
+        <a href="{% url 'schedule:update' pk=schedule.pk %}" class="card" style="padding: 8px 15px; text-decoration: none; font-size: 0.9em; background: var(--bg-color); border: 1px solid var(--border-color); color: var(--text-main);">✏️ 編集</a>
     </div>
 
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
@@ -36,36 +40,64 @@
     <div class="meta-label">📝 概要・メモ</div>
     <div style="background: var(--bg-color); padding: 15px; border-radius: 8px; margin-bottom: 25px; white-space: pre-wrap;">{{ course.description|default:"メモはありません。" }}</div>
 
-    <h2 style="font-size: 1.2em; border-bottom: 2px solid var(--border-color); padding-bottom: 10px;">✍️ ToDoリスト</h2>
-    <div style="margin-top: 15px;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid var(--border-color); padding-bottom: 10px; margin-bottom: 15px;">
+        <h2 style="font-size: 1.2em; margin: 0;">✍️ ToDoリスト</h2>
+        
+        <a href="?all={% if show_all %}0{% else %}1{% endif %}" style="font-size: 0.85em; text-decoration: none; color: var(--accent-color); border: 1px solid var(--accent-color); padding: 4px 10px; border-radius: 15px;">
+            {% if show_all %}未完了のみ表示{% else %}完了済みも表示{% endif %}
+        </a>
+    </div>
+
+    <div>
         {% for task in tasks %}
-            <div class="task-item" style="display: flex; justify-content: space-between; align-items: center;">
+            <div class="task-item {% if task.is_completed %}task-completed{% endif %}" style="display: flex; justify-content: space-between; align-items: center; {% if task.is_completed %}padding-left: 10px; padding-right: 10px; border-radius: 8px;{% endif %}">
                 <div>
-                    <span style="{% if task.is_completed %}text-decoration: line-through; color: var(--text-sub);{% endif %} font-weight: bold;">
+                    <span class="task-title" style="font-weight: bold; display: block;">
                         {{ task.title }}
                     </span>
-                    <div style="font-size: 0.8em; color: var(--text-sub);">📅 期限: {{ task.due_date|default:"未設定" }}</div>
+                    <div style="font-size: 0.8em; color: var(--text-sub); margin-top: 4px;">
+                        {% if task.due_date %}📅 期限: {{ task.due_date }}{% else %}📅 期限なし{% endif %}
+                    </div>
                 </div>
+                
                 <div style="display: flex; gap: 8px;">
-                    <a href="{% url 'schedule:task_toggle' pk=task.pk %}" style="text-decoration: none; font-size: 0.8em; padding: 5px 10px; border-radius: 5px; background: {% if task.is_completed %}#666{% else %}#28a745{% endif %}; color: white;">
-                        {% if task.is_completed %}未完了に戻す{% else %}完了{% endif %}
+                    <a href="{% url 'schedule:task_toggle' pk=task.pk %}" 
+                       style="text-decoration: none; font-size: 0.8em; padding: 6px 12px; border-radius: 6px; font-weight: bold; 
+                              {% if task.is_completed %}background: #e2e8f0; color: #64748b; border: 1px solid #cbd5e1;
+                              {% else %}background: #dcfce7; color: #166534; border: 1px solid #86efac;{% endif %}">
+                        {% if task.is_completed %}↩️ 戻す{% else %}✅ 完了{% endif %}
                     </a>
-                    <a href="{% url 'schedule:task_delete' pk=task.pk %}" style="text-decoration: none; font-size: 0.8em; padding: 5px 10px; border-radius: 5px; background: #ff4d4f; color: white;" onclick="return confirm('本当に削除しますか？')">削除</a>
+                    
+                    <a href="{% url 'schedule:task_delete' pk=task.pk %}" 
+                       style="text-decoration: none; font-size: 0.8em; padding: 6px 12px; border-radius: 6px; background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; font-weight: bold;" 
+                       onclick="return confirm('本当にこのタスクを削除しますか？')">
+                        🗑️
+                    </a>
                 </div>
             </div>
         {% empty %}
-            <p style="color: var(--text-sub); text-align: center;">登録されたToDoはありません。</p>
+            <p style="color: var(--text-sub); text-align: center; padding: 20px;">
+                {% if show_all %}
+                    タスクはありません。
+                {% else %}
+                    未完了のタスクはありません。<br>
+                    <small>（右上のボタンで完了済みを確認できます）</small>
+                {% endif %}
+            </p>
         {% endfor %}
     </div>
 
-    <div style="margin-top: 30px; padding: 20px; background: var(--bg-color); border-radius: 10px;">
-        <h3 style="margin-top: 0; font-size: 1em;">＋ 新しいToDoを追加</h3>
+    <div style="margin-top: 30px; padding: 20px; background: var(--bg-color); border-radius: 10px; border: 1px solid var(--border-color);">
+        <h3 style="margin-top: 0; font-size: 1em; margin-bottom: 15px;">＋ 新しいToDoを追加</h3>
         <form method="post" style="display: grid; gap: 10px;">
             {% csrf_token %}
-            {{ task_form.title }}
+            <div>
+                {{ task_form.title }}
+            </div>
             <div style="display: flex; gap: 10px; align-items: center;">
-                <span style="font-size: 0.9em;">期限:</span>{{ task_form.due_date }}
-                <button type="submit" style="background: var(--accent-color); color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold;">追加</button>
+                <span style="font-size: 0.9em; white-space: nowrap;">期限:</span>
+                {{ task_form.due_date }}
+                <button type="submit" style="background: var(--accent-color); color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; white-space: nowrap;">追加</button>
             </div>
         </form>
     </div>
@@ -73,7 +105,7 @@
 
 <style>
     input[type="text"], input[type="date"] {
-        width: 100%; padding: 10px; border-radius: 5px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main);
+        width: 100%; padding: 12px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); box-sizing: border-box;
     }
 </style>
 {% endblock %}
