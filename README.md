@@ -116,47 +116,67 @@ graph LR
 ```mermaid
 %%{init: {'theme': 'neutral'} }%%
 erDiagram
-    %% 定義
-    User ||--o{ Timetable : "Creates"
-    Timetable ||--|{ Day : "Has"
-    Timetable ||--|{ Period : "Has"
-    Day ||--o{ Schedule : "Contains"
-    Period ||--o{ Schedule : "Contains"
+    User ||--o{ Timetable : "所有する"
+    User ||--o{ Schedule : "登録する"
+    Timetable ||--|{ Day : "構成要素"
+    Timetable ||--|{ Period : "構成要素"
+    
+    Day ||--o{ Schedule : "割り当て"
+    Period ||--o{ Schedule : "割り当て"
+    
+    Course ||--o{ Schedule : "授業インスタンス"
+    Course ||--o{ Task : "課題を持つ"
 
-    %% テーブル詳細
     User {
         int id PK
         string username
-        string password_hash
     }
 
     Timetable {
         int id PK
-        string name "Semester Name"
-        boolean is_default
         int user_id FK
+        string name "時間割名"
+        boolean is_default "メインフラグ"
     }
 
     Day {
         int id PK
-        string name "Mon/Tue"
-        int order
         int timetable_id FK
+        string name "曜日名"
+        int order "表示順"
     }
 
     Period {
         int id PK
-        string name "1st/2nd"
-        int order
         int timetable_id FK
+        string name "時限名"
+        time start_time
+        time end_time
+        int order "表示順"
+    }
+
+    Course {
+        int id PK
+        string name "授業名"
+        string instructor "担当教員"
+        string room "教室"
+        string color "テーマカラー"
     }
 
     Schedule {
         int id PK
-        string subject
-        string memo
+        int user_id FK
+        int course_id FK
         int day_id FK
         int period_id FK
+    }
+
+    Task {
+        int id PK
+        int course_id FK
+        string title "タスク名"
+        date due_date "期限"
+        boolean is_completed "完了フラグ"
     }
 ```
 
