@@ -84,6 +84,75 @@
     [data-theme="dark"] .class-cell[style*="#fff1f0"] { background-color: rgba(255, 123, 114, 0.15) !important; }
     [data-theme="dark"] .class-cell[style*="#fffbe6"] { background-color: rgba(255, 166, 87, 0.15) !important; }
     [data-theme="dark"] .class-cell[style*="#e6f7ff"] { background-color: rgba(88, 166, 255, 0.15) !important; }
+
+    /* === 📱 モバイル（スマホ）専用レスポンシブ設定 === */
+    @media (max-width: 768px) {
+        /* 1. テーブルの幅固定を解除して横スクロールさせる */
+        table {
+            table-layout: auto; /* 幅固定を解除 */
+            width: auto;        /* 画面幅に合わせない */
+            min-width: 100%;    /* 最低でも画面いっぱい */
+        }
+        
+        /* 曜日列（月・火...）の幅を確保 */
+        th, td {
+            min-width: 85px;    /* 1コマの幅を確保 */
+            padding: 4px;       /* 余白を詰める */
+        }
+
+        /* 2. 左端（時限）列をスリム化 */
+        .header-col-period {
+            width: 30px;
+            min-width: 30px;
+            font-size: 0.8em;
+            padding: 2px !important;
+            white-space: normal;
+        }
+
+        /* 時刻（9:00〜）は狭いので非表示 */
+        .time-container {
+            display: none;
+        }
+
+        /* 3. コマの高さと文字サイズ調整 */
+        .class-cell {
+            height: 95px; /* 高さを少し低く */
+        }
+        
+        .course-name {
+            font-size: 0.75em;
+            white-space: normal; /* 長い授業名は改行 */
+            line-height: 1.2;
+            max-height: 2.4em;
+            overflow: hidden;
+        }
+
+        .course-details {
+            font-size: 0.65em;
+            margin-top: 2px;
+        }
+        
+        /* バッジや進捗バーの微調整 */
+        .status-badge {
+            font-size: 0.5em;
+            padding: 1px 3px;
+        }
+        .task-area {
+            margin-top: 4px;
+            padding-top: 2px;
+        }
+        .progress-bar {
+            height: 4px;
+        }
+        .progress-text {
+            display: none; /* スマホでは進捗の文字を消す */
+        }
+
+        /* 4. ヘッダーやボタン周り */
+        h1 { font-size: 1.1em !important; }
+        .management-button { padding: 8px 12px; font-size: 0.8em; }
+        .switch-btn { padding: 6px; font-size: 0.75em; min-width: auto; }
+    }
 </style>
 
 <div class="card" style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
