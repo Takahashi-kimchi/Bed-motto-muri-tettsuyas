@@ -54,10 +54,10 @@ GitHub Projects (Kanban Board) を活用し、タスクの可視化と進捗管�
 ### Story Board (利用シナリオ)
 ユーザーが課題を解決するまでのストーリー：
 
-![Story Board](images/Slide1.png)
-![Story Board](images/Slide2.png)
-![Story Board](images/Slide3.png)
-![Story Board](images/Slide4.png)
+![Story Board](images/Slide1.jpg)
+![Story Board](images/Slide2.jpg)
+![Story Board](images/Slide3.jpg)
+![Story Board](images/Slide4.jpg)
 
 ---
 
