@@ -46,14 +46,18 @@ GitHub Projects (Kanban Board) を活用し、タスクの可視化と進捗管�
 * **システムへの要件:**
 時限、曜日を自由に変えられる、時限や曜日の部分は自由記述にすることで講義以外の予定の管理もできるとよい。ToDoリストは実装してほしい。授業ごとのToDoリストの進捗度もわかるとうれしい。
 
+## 📱 UI/UX Highlights
+本アプリケーションは「毎日使いたくなる」視認性と操作性を追求しました。
+
+![UI Mockup](images/mock.png)
+
 ### Story Board (利用シナリオ)
 ユーザーが課題を解決するまでのストーリー：
 
-![Story Board]([画像: ここにストーリーボード（4コマ漫画や図）の画像を貼ってください])
-
-1. **Scene 1 (課題発生):** [記述: 朝、寝坊して教室がわからない！ポータルも繋がらない！]
-2. **Scene 2 (解決策):** [記述: Timetable SaaSを開く。0.5秒で時間割が表示される。]
-3. **Scene 3 (価値享受):** [記述: 「あ、3号館か」と即座に理解し、遅刻を回避。]
+![Story Board](images/Slide1.jpg)
+![Story Board](images/Slide2.jpg)
+![Story Board](images/Slide3.jpg)
+![Story Board](images/Slide4.jpg)
 
 ---
 
