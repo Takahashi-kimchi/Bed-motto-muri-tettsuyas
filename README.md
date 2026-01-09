@@ -29,8 +29,8 @@
 GitHub Projects (Kanban Board) を活用し、タスクの可視化と進捗管理を行いました。
 
 **Kanban Board Snapshot:**
-[![Kanban Board]([画像: ここにGitHub Projectsのカンバンボードのスクショ画像を貼ってください])]
-(https://github.com/users/Takahashi-kimchi/projects/1/views/1?layout_template=boa)
+![Kanban Board](images/kanban.png)
+([https://github.com/users/Takahashi-kimchi/projects/1/views/1?layout_template=boa](https://github.com/users/Takahashi-kimchi/projects/1))
 
 ---
 
