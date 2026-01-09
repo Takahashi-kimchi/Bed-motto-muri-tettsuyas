@@ -9,6 +9,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils import timezone
 from django.core.exceptions import PermissionDenied
 from datetime import time
+from django.db.models import ProtectedError
+from django.contrib import messages
 
 from .models import Day, Period, Schedule, Course, Task, Timetable
 from .forms import (
@@ -403,6 +405,27 @@ class DayDeleteView(LoginRequiredMixin, UserDataMixin, DeleteView):
     template_name = 'schedule/day_confirm_delete.html'
     success_url = reverse_lazy('schedule:timetable_list')
 
+    # 1. 確認画面に「消えてしまう授業リスト」を渡す
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # この曜日に紐付いている授業を取得してテンプレートに渡す
+        context['related_schedules'] = Schedule.objects.filter(day=self.object)
+        return context
+
+    # 2. 「削除」ボタンが押された時の処理
+    def form_valid(self, form):
+        self.object = self.get_object() # 削除対象の曜日を取得
+        success_url = self.get_success_url()
+        
+        # ★ここがポイント：親（曜日）を消す前に、子供（授業）を先に全部消す
+        # これにより "ProtectedError" を回避します
+        Schedule.objects.filter(day=self.object).delete()
+        
+        # 授業が消えたので、安心して曜日を削除
+        self.object.delete()
+        
+        return redirect(success_url)
+
 class PeriodCreateView(LoginRequiredMixin, CreateView):
     model = Period
     form_class = PeriodForm
@@ -430,6 +453,26 @@ class PeriodDeleteView(LoginRequiredMixin, UserDataMixin, DeleteView):
     model = Period
     template_name = 'schedule/period_confirm_delete.html'
     success_url = reverse_lazy('schedule:timetable_list')
+
+    # 1. 確認画面に「消えてしまう授業リスト」を渡す
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # この時限に紐付いている授業を取得してテンプレートに渡す
+        context['related_schedules'] = Schedule.objects.filter(period=self.object)
+        return context
+
+    # 2. 「削除」ボタンが押された時の処理
+    def form_valid(self, form):
+        self.object = self.get_object() # 削除対象の時限を取得
+        success_url = self.get_success_url()
+        
+        # ★ここがポイント：親（時限）を消す前に、子供（授業）を先に全部消す
+        Schedule.objects.filter(period=self.object).delete()
+        
+        # 授業が消えたので、安心して時限を削除
+        self.object.delete()
+        
+        return redirect(success_url)
 
 # --- その他操作 (タスク切り替えなど) ---
 
