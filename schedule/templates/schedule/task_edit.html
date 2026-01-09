@@ -1,42 +1,54 @@
-{% extends 'base.html' %} 
+{% extends 'base.html' %}
 
-{% block title %}ToDo 編集: {{ task.title }}{% endblock %}
+{% block title %}タスクの編集{% endblock %}
 
 {% block content %}
 <div style="max-width: 600px; margin: 0 auto;">
     <div style="margin-bottom: 20px;">
-        {% with first_schedule=task.course.schedule_set.all|first %}
-            {% if first_schedule %}
-                <a href="{% url 'schedule:detail' pk=first_schedule.pk %}" style="text-decoration: none; color: var(--accent-color); font-weight: bold;">← 授業詳細に戻る</a>
-            {% else %}
-                <a href="{% url 'schedule:time_table' %}" style="text-decoration: none; color: var(--accent-color); font-weight: bold;">← 時間割に戻る</a>
-            {% endif %}
-        {% endwith %}
+        <a href="javascript:history.back()" style="text-decoration: none; color: var(--accent-color); font-weight: bold;">← 戻る</a>
     </div>
 
     <div class="card">
-        <h1 style="font-size: 1.5em; margin-bottom: 10px; color: var(--text-main);">📝 ToDo 編集</h1>
-        <p style="color: var(--text-sub); margin-bottom: 25px;">授業: <strong style="color: var(--text-main);">{{ task.course.name }}</strong></p>
-
+        <h1 style="margin-top: 0; font-size: 1.5em; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; margin-bottom: 20px;">
+            ✏️ タスクの編集
+        </h1>
+        
         <form method="post">
             {% csrf_token %}
-            <div style="display: grid; gap: 20px;">
-                {{ form.as_p }}
+            
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; font-weight: bold; margin-bottom: 8px; color: var(--text-sub);">タスク名</label>
+                {{ form.title }}
             </div>
             
-            <button type="submit" style="width: 100%; margin-top: 20px; background: var(--accent-color); color: white; padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">
-                変更を保存
-            </button>
+            <div style="margin-bottom: 25px;">
+                <label style="display: block; font-weight: bold; margin-bottom: 8px; color: var(--text-sub);">期限</label>
+                {{ form.due_date }}
+            </div>
+
+            <div style="display: flex; gap: 10px;">
+                <button type="submit" style="background: var(--accent-color); color: white; border: none; padding: 12px 25px; border-radius: 8px; font-weight: bold; cursor: pointer; flex: 1;">
+                    保存する
+                </button>
+                <a href="javascript:history.back()" style="display: block; text-align: center; text-decoration: none; background: var(--bg-color); color: var(--text-main); border: 1px solid var(--border-color); padding: 12px 25px; border-radius: 8px; font-weight: bold; cursor: pointer;">
+                    キャンセル
+                </a>
+            </div>
         </form>
     </div>
 </div>
 
 <style>
-    /* フォーム内の各要素をダークモード対応に強制 */
-    p { margin-bottom: 15px; }
-    input[type="text"], input[type="date"], select, textarea {
-        width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--card-bg); color: var(--text-main); box-sizing: border-box;
+    /* フォームパーツのデザイン */
+    input[type="text"], input[type="date"] {
+        width: 100%;
+        padding: 12px;
+        border-radius: 6px;
+        border: 1px solid var(--border-color);
+        background: var(--bg-color);
+        color: var(--text-main);
+        box-sizing: border-box;
+        font-size: 1em;
     }
-    input[type="checkbox"] { transform: scale(1.2); margin-right: 10px; }
 </style>
 {% endblock %}
