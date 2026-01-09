@@ -18,8 +18,18 @@
                 【警告】この操作は取り消せません。
             </p>
             <p style="margin-bottom: 0; font-size: 0.9em; color: var(--text-main);">
-                このセットを削除すると、紐づいている全ての曜日、時限、および登録されたすべての授業データが失われます。
+                このセットを削除すると、紐づいている全ての曜日、時限、および以下の授業データが失われます。
             </p>
+
+            {% if related_schedules %}
+                <ul style="color: #c53030; font-size: 0.9em; margin-top: 10px; max-height: 150px; overflow-y: auto;">
+                    {% for schedule in related_schedules %}
+                        <li>{{ schedule.course.name }} ({{ schedule.day.name }} {{ schedule.period.name }})</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p style="font-size: 0.9em; color: #666; margin-top: 10px;">(登録されている授業はありません)</p>
+            {% endif %}
         </div>
 
         <form method="post">

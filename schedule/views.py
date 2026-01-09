@@ -377,6 +377,38 @@ class TimetableDeleteView(LoginRequiredMixin, UserDataMixin, DeleteView):
     template_name = 'schedule/timetable_confirm_delete.html'
     success_url = reverse_lazy('schedule:timetable_list')
 
+    # 1. 確認画面に「削除される授業リスト」を渡す
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # この時間割に含まれる全ての授業を取得 (day__timetable で検索)
+        context['related_schedules'] = Schedule.objects.filter(day__timetable=self.object)
+        return context
+
+    # 2. 「削除」ボタンが押された時の処理
+    def form_valid(self, form):
+        self.object = self.get_object()
+        success_url = self.get_success_url()
+
+        # 削除対象の授業リストを取得
+        schedules = Schedule.objects.filter(day__timetable=self.object)
+        
+        # 授業に紐づく「コース(Course)」がゴミとして残らないようにチェック用リストを作成
+        courses_to_check = list(set([s.course for s in schedules]))
+
+        # ★ここがポイント：親（時間割）を消す前に、中身（授業）を先に全部消す
+        # これにより Day/Period の ProtectedError を回避します
+        schedules.delete()
+
+        # 授業が消えたので、使われなくなったコースがあれば削除する（お掃除）
+        for course in courses_to_check:
+            if not Schedule.objects.filter(course=course).exists():
+                course.delete()
+
+        # 最後に時間割本体を削除（これに連動して Day や Period も消えます）
+        self.object.delete()
+        
+        return redirect(success_url)
+
 class DayCreateView(LoginRequiredMixin, CreateView):
     model = Day
     form_class = DayForm
