@@ -14,14 +14,7 @@
 ## 🎥 1. Demonstration
 実際のアプリの動作デモ動画です。
 
-**Demo Video URL:**
-[リンク: ここにYouTubeまたはGoogleDriveの共有リンクを貼ってください]
-
-> **動画の内容:**
-> 1. ユーザーログイン
-> 2. 新しい時間割の作成
-> 3. 授業の登録（曜日・時限の選択）
-> 4. エラーハンドリング（重複登録時の警告）の確認
+https://github.com/user-attachments/assets/7beec6b5-3930-49d1-83e7-a78b9cbb2416
 
 ---
 
