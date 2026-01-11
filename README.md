@@ -176,7 +176,6 @@ erDiagram
         date due_date "期限日"
         boolean is_completed "完了フラグ"
     }
-    }
 ```
 
 ### Key Database Features (評価ポイント)
