@@ -114,7 +114,7 @@ graph LR
 %%{init: {'theme': 'neutral'} }%%
 erDiagram
     User ||--o{ Timetable : "所有する"
-    User ||--o{ Schedule : "登録する"
+    User ||--o{ Schedule : "所有する(意図的な非正規化)"
     Timetable ||--|{ Day : "構成要素"
     Timetable ||--|{ Period : "構成要素"
     
@@ -156,7 +156,9 @@ erDiagram
         int id PK
         string name "授業名"
         string instructor "担当教員"
+        string room "教室名"
         text description "詳細"
+        string color "テーマカラー"
     }
 
     Schedule {
@@ -165,7 +167,6 @@ erDiagram
         int course_id FK "授業"
         int day_id FK "曜日"
         int period_id FK "時限"
-        string room "教室名"
     }
 
     Task {
