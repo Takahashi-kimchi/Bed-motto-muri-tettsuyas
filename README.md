@@ -126,54 +126,56 @@ erDiagram
 
     User {
         int id PK
-        string username
+        string username "ユーザー名"
     }
 
     Timetable {
         int id PK
-        int user_id FK
+        int user_id FK "所有ユーザー"
         string name "時間割名"
-        boolean is_default "メインフラグ"
+        boolean is_default "デフォルト"
     }
 
     Day {
         int id PK
-        int timetable_id FK
+        int timetable_id FK "所属時間割"
         string name "曜日名"
-        int order "表示順"
+        int order "並び順"
     }
 
     Period {
         int id PK
-        int timetable_id FK
+        int timetable_id FK "所属時間割"
         string name "時限名"
-        time start_time
-        time end_time
-        int order "表示順"
+        time start_time "開始時刻"
+        time end_time "終了時刻"
+        int order "並び順"
     }
 
     Course {
         int id PK
         string name "授業名"
         string instructor "担当教員"
-        string room "教室"
-        string color "テーマカラー"
+        text description "詳細"
     }
 
     Schedule {
         int id PK
-        int user_id FK
-        int course_id FK
-        int day_id FK
-        int period_id FK
+        int user_id FK "所有ユーザー"
+        int course_id FK "授業"
+        int day_id FK "曜日"
+        int period_id FK "時限"
+        string room "教室名"
     }
 
     Task {
         int id PK
-        int course_id FK
+        int course_id FK "対象授業"
         string title "タスク名"
-        date due_date "期限"
+        text description "詳細"
+        date due_date "期限日"
         boolean is_completed "完了フラグ"
+    }
     }
 ```
 
