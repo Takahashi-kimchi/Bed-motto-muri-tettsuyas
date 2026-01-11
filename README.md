@@ -209,8 +209,22 @@ erDiagram
 | **Infrastructure** | Render | PaaS (Platform as a Service) |
 | **Version Control** | Git / GitHub | ソースコード管理 |
 
-### Application Process Flow
-1. **Request:** ユーザーがHTTPSリクエストを送信。
-2. **Routing:** Djangoの `urls.py` がリクエストを解析し、適切なViewに振り分け。
-3. **Logic:** `views.py` がDBからデータを取得し、重複チェック等のビジネスロジックを実行。
-4. **Response:** データを埋め込んだHTMLテンプレートをレンダリングして返却。
+## 🔄 アプリケーション実行フロー (Application Process Flow)
+
+本システムは、リクエストからレスポンスまで以下のプロセスを経て安全かつ高速にデータを処理します。
+
+1. **Request & Routing**
+   - ユーザーのリクエストを `urls.py` が解析し、最適なViewへルーティングします。
+   - アプリケーション・ネームスペース（`schedule`）による整合性の取れたURL管理を行っています。
+
+2. **Business Logic & Security**
+   - `views.py` において、ユーザー認証（`LoginRequiredMixin`）とデータの所有権を厳密に検証します。
+   - 重複チェックやトランザクション処理により、DBの整合性を常に維持します。
+
+3. **Database Interaction**
+   - Django ORMを通じて PostgreSQL (Neon) と通信。
+   - 戦略的非正規化により、最小限のクエリで必要なデータを高速に抽出します。
+
+4. **Template Rendering**
+   - 処理結果を各HTMLテンプレート（Django Template System）に反映。
+   - カスタムフィルター（`schedule_tags.py`）等を活用し、複雑な時間割データも直感的なUIで出力します。
