@@ -14,14 +14,7 @@
 ## 🎥 1. Demonstration
 実際のアプリの動作デモ動画です。
 
-**Demo Video URL:**
-[リンク: ここにYouTubeまたはGoogleDriveの共有リンクを貼ってください]
-
-> **動画の内容:**
-> 1. ユーザーログイン
-> 2. 新しい時間割の作成
-> 3. 授業の登録（曜日・時限の選択）
-> 4. エラーハンドリング（重複登録時の警告）の確認
+https://github.com/user-attachments/assets/7beec6b5-3930-49d1-83e7-a78b9cbb2416
 
 ---
 
@@ -121,7 +114,7 @@ graph LR
 %%{init: {'theme': 'neutral'} }%%
 erDiagram
     User ||--o{ Timetable : "所有する"
-    User ||--o{ Schedule : "登録する"
+    User ||--o{ Schedule : "所有する(意図的な非正規化)"
     Timetable ||--|{ Day : "構成要素"
     Timetable ||--|{ Period : "構成要素"
     
@@ -133,67 +126,75 @@ erDiagram
 
     User {
         int id PK
-        string username
+        string username "ユーザー名"
     }
 
     Timetable {
         int id PK
-        int user_id FK
+        int user_id FK "所有ユーザー"
         string name "時間割名"
-        boolean is_default "メインフラグ"
+        boolean is_default "デフォルト"
     }
 
     Day {
         int id PK
-        int timetable_id FK
+        int timetable_id FK "所属時間割"
         string name "曜日名"
-        int order "表示順"
+        int order "並び順"
     }
 
     Period {
         int id PK
-        int timetable_id FK
+        int timetable_id FK "所属時間割"
         string name "時限名"
-        time start_time
-        time end_time
-        int order "表示順"
+        time start_time "開始時刻"
+        time end_time "終了時刻"
+        int order "並び順"
     }
 
     Course {
         int id PK
         string name "授業名"
         string instructor "担当教員"
-        string room "教室"
+        string room "教室名"
+        text description "詳細"
         string color "テーマカラー"
     }
 
     Schedule {
         int id PK
-        int user_id FK
-        int course_id FK
-        int day_id FK
-        int period_id FK
+        int user_id FK "所有ユーザー"
+        int course_id FK "授業"
+        int day_id FK "曜日"
+        int period_id FK "時限"
     }
 
     Task {
         int id PK
-        int course_id FK
+        int course_id FK "対象授業"
         string title "タスク名"
-        date due_date "期限"
+        text description "詳細"
+        date due_date "期限日"
         boolean is_completed "完了フラグ"
     }
 ```
 
 ### Key Database Features (評価ポイント)
 
-* **高度な正規化とデータ整合性 (Normalization):**
-    * 単なる時間割の記録に留まらず、`Course`（授業情報）と`Schedule`（配置情報）を分離。これにより、週2回ある同一科目が**課題（Task）やメモを自動的に共有**できる設計となっており、データの重複を排除しつつ実用性を高めています。
-* **複合ユニーク制約による衝突防止 (Unique Constraints):**
-    * データベースレベルで `unique_together = ('user', 'day', 'period')` を設定。物理的なデータの重複登録を未然に防ぐとともに、アプリケーション層での論理チェック（重複警告UI）と組み合わせた多重のガードを構築しています。
-* **戦略的な参照整合性 (Foreign Key Strategy):**
-    * `CASCADE`（時間割削除時に曜日・時限を連動削除）と `PROTECT`（授業配置がある曜日・時限の不用意な削除を防止）を使い分け。ユーザーの誤操作によるデータ消失を防ぎ、リレーショナルデータベースとしての整合性を維持しています。
-* **トランザクションの原子性 (Atomic Transactions):**
-    * `@transaction.atomic` を採用。授業の新規登録時、既存データの有無をチェックし「再利用」または「新規作成」を行う一連のプロセスを一つの単位として処理。エラー時の自動ロールバックにより、中途半端なデータ書き込みを許しません。
+- **高度な正規化 (Normalization)**<br>
+  `Course`（授業情報）と `Schedule`（配置情報）を分離。週複数回の授業でも課題（Task）やメモを自動共有し、データの重複を排除しています。
+
+- **複合ユニーク制約 (Unique Constraints)**<br>
+  `unique_together = ('user', 'day', 'period')` を設定。DBレベルの物理制約とUI層の論理チェックを組み合わせた二重ガードで、登録の衝突を未然に防ぎます。
+
+- **戦略的な参照整合性 (Foreign Key Strategy)**<br>
+  `CASCADE`（一括削除）と `PROTECT`（誤削除防止）を機能ごとに使い分け。関連データのクリーンアップロジックも実装し、データの整合性を維持しています。
+
+- **トランザクションの原子性 (Atomic Transactions)**<br>
+  `@transaction.atomic` を採用。授業の新規登録や再利用プロセスを不可分な操作として扱い、エラー時の完全ロールバックによってデータの不整合を防ぎます。
+
+- **戦略的非正規化 (Strategic Denormalization)**<br>
+  パフォーマンスを考慮し、頻繁なアクセスが発生する `Schedule` モデルにあえて所有者情報を持たせることで、クエリ速度を劇的に向上させています。
 
 ---
 
@@ -208,8 +209,22 @@ erDiagram
 | **Infrastructure** | Render | PaaS (Platform as a Service) |
 | **Version Control** | Git / GitHub | ソースコード管理 |
 
-### Application Process Flow
-1. **Request:** ユーザーがHTTPSリクエストを送信。
-2. **Routing:** Djangoの `urls.py` がリクエストを解析し、適切なViewに振り分け。
-3. **Logic:** `views.py` がDBからデータを取得し、重複チェック等のビジネスロジックを実行。
-4. **Response:** データを埋め込んだHTMLテンプレートをレンダリングして返却。
+## 🔄 アプリケーション実行フロー (Application Process Flow)
+
+本システムは、リクエストからレスポンスまで以下のプロセスを経て安全かつ高速にデータを処理します。
+
+1. **Request & Routing**
+   - ユーザーのリクエストを `urls.py` が解析し、最適なViewへルーティングします。
+   - アプリケーション・ネームスペース（`schedule`）による整合性の取れたURL管理を行っています。
+
+2. **Business Logic & Security**
+   - `views.py` において、ユーザー認証（`LoginRequiredMixin`）とデータの所有権を厳密に検証します。
+   - 重複チェックやトランザクション処理により、DBの整合性を常に維持します。
+
+3. **Database Interaction**
+   - Django ORMを通じて PostgreSQL (Neon) と通信。
+   - 戦略的非正規化により、最小限のクエリで必要なデータを高速に抽出します。
+
+4. **Template Rendering**
+   - 処理結果を各HTMLテンプレート（Django Template System）に反映。
+   - カスタムフィルター（`schedule_tags.py`）等を活用し、複雑な時間割データも直感的なUIで出力します。
